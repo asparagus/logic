@@ -2,12 +2,13 @@ class Variable:
     def __init__(self, name):
         """
         Creates a new variable with a given name
+        Constant names are all upper case
 
         >>> x = Variable('x')
         >>> x.name
-        'x'
+        'X'
         """
-        self.name = name
+        self.name = name.upper()
 
     def __str__(self):
         """

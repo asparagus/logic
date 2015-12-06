@@ -6,9 +6,9 @@ import expression
 
 
 class Atomic(expression.Expression):
-    def __init__(self, p, x):
+    def __init__(self, p, *x):
         """
-        Creates a new atomic expression with given predicate and elements
+        Creates a new atomic expression with given predicate and arguments
 
         >>> a = Atomic('P', 'x')
         >>> a.predicate
@@ -17,21 +17,23 @@ class Atomic(expression.Expression):
         'x'
         """
         self.predicate = p
-        self.element = x
+        self.arguments = x
 
     def eval(self, knowledge={}):
         """
         Evaluates an atomic expression on a given knowledge base
 
         >>> a = Atomic('P', 'x')
-        >>> k = {'P': {'x': True}}
+        >>> k = {'P': {('x',): True}}
         >>> a.eval(k)
         True
         >>> a.eval()
         False
         """
-        if self.predicate in knowledge:
-            if self.element in knowledge[self.predicate]:
+        pred = self.predicate.name
+        args = tuple(arg.name for arg in self.arguments)
+        if pred in knowledge:
+            if args in knowledge[pred]:
                 return True
 
         return False
@@ -45,7 +47,8 @@ class Atomic(expression.Expression):
         'P(x, y, z)'
         """
         return '%s(%s)' % (self.predicate, ', '.join([str(x)
-                                                      for x in self.element]))
+                                                      for x in self.arguments]
+                                                     ))
 
 
 def test():

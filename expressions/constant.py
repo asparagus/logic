@@ -2,12 +2,13 @@ class Constant:
     def __init__(self, name):
         """
         Creates a new constant with a given name
+        Constant names are all lower case
 
         >>> a = Constant('a')
         >>> a.name
         'a'
         """
-        self.name = name
+        self.name = name.lower()
 
     def __str__(self):
         """
