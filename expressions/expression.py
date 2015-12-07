@@ -8,6 +8,9 @@ class Expression:
     def __str__(self):
         return 'Expression'
 
+    def type(self):
+        return 'Expression'
+
 
 class Contradiction(Expression):
     def __init__(self):
@@ -29,6 +32,9 @@ class Contradiction(Expression):
     def __str__(self):
         return 'F'
 
+    def type(self):
+        return 'Contradiction'
+
 
 class Tautology(Expression):
     def __init__(self):
@@ -49,6 +55,9 @@ class Tautology(Expression):
 
     def __str__(self):
         return 'T'
+
+    def type(self):
+        return 'Tautology'
 
 
 def test():

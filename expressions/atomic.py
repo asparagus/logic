@@ -10,11 +10,17 @@ class Atomic(expression.Expression):
         """
         Creates a new atomic expression with given predicate and arguments
 
-        >>> a = Atomic('P', 'x')
-        >>> a.predicate
+        >>> import variable
+        >>> import predicate
+        >>> p = predicate.Predicate('P')
+        >>> x = variable.Variable('X')
+        >>> a = Atomic(p, x)
+        >>> a.predicate.name
         'P'
-        >>> a.element
-        'x'
+        >>> len(a.arguments)
+        1
+        >>> a.arguments[0].name
+        'X'
         """
         self.predicate = p
         self.arguments = x
@@ -23,8 +29,12 @@ class Atomic(expression.Expression):
         """
         Evaluates an atomic expression on a given knowledge base
 
-        >>> a = Atomic('P', 'x')
-        >>> k = {'P': {('x',): True}}
+        >>> import variable
+        >>> import predicate
+        >>> p = predicate.Predicate('P')
+        >>> x = variable.Variable('X')
+        >>> a = Atomic(p, x)
+        >>> k = {'P': {('X',): True}}
         >>> a.eval(k)
         True
         >>> a.eval()
@@ -42,13 +52,22 @@ class Atomic(expression.Expression):
         """
         String representation to print
 
-        >>> a = Atomic('P', ('x', 'y', 'z'))
+        >>> import variable
+        >>> import predicate
+        >>> p = predicate.Predicate('P')
+        >>> x = variable.Variable('X')
+        >>> y = variable.Variable('Y')
+        >>> z = variable.Variable('Z')
+        >>> a = Atomic(p, x, y, z)
         >>> str(a)
-        'P(x, y, z)'
+        'P(X, Y, Z)'
         """
         return '%s(%s)' % (self.predicate, ', '.join([str(x)
                                                       for x in self.arguments]
                                                      ))
+
+    def type(self):
+        return 'Atomic'
 
 
 def test():

@@ -46,9 +46,12 @@ class Disjunction(expression.Expression):
         >>> f = expression.Contradiction()
         >>> a = Disjunction(t, f)
         >>> str(a)
-        '(T) | (F)'
+        '(T | F)'
         """
-        return '(%s) | (%s)' % (self.expr1, self.expr2)
+        return '(%s | %s)' % (self.expr1, self.expr2)
+
+    def type(self):
+        return 'Disjunction'
 
 
 def test():

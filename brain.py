@@ -37,30 +37,36 @@ class Brain:
         >>> b.eval(q)
         False
         """
-        return e.eval(self.knowledge)
+        result = e.eval(self.knowledge)
+        print('%s => %s' % (e, result))
+        return result
 
     def learn(self, e):
         """
         Adds a given expression to the knowledge base
 
         >>> p = expressions.predicate.Predicate('P')
-        >>> c = expressions.constant.Constant('c')
-        >>> a = expressions.atomic.Atomic(p, c)
+        >>> x = expressions.constant.Constant('x')
+        >>> a = expressions.atomic.Atomic(p, x)
         >>> b = Brain()
         >>> b.learn(a)
         >>> b.eval(a)
         True
         """
-        if type(e) is expressions.conjunction.Conjunction:
+        print('Brain <- %s' % str(e))
+        if e.type() == 'Conjunction':
             self.learn(e.expr1)
             self.learn(e.expr2)
 
-        elif type(e) is expressions.atomic.Atomic:
+        elif e.type() == 'Atomic':
             p = e.predicate.name
             if p not in self.knowledge:
                 self.knowledge[p] = {}
 
             self.knowledge[p][tuple(x.name for x in e.arguments)] = True
+
+        else:
+            print('None')
 
 
 def test():

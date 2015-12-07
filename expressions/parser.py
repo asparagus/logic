@@ -2,7 +2,6 @@ if __package__ is not None:
     import sys
     sys.path.append('./' + __package__.replace('.', '/'))
 
-import expression
 import conjunction
 import disjunction
 import negation
@@ -22,7 +21,23 @@ class Parser:
         """
         pass
 
+    def unbox(self, str_expression):
+        """
+        Removes unnecessary parenthesis
+
+        >>> p = Parser()
+        >>> p.unbox('((hey,))')
+        'hey,'
+        """
+        while str_expression[0] == '(' and\
+                self.closure(str_expression) == len(str_expression) - 1:
+            str_expression = str_expression[1:-1].strip()
+
+        return str_expression
+
     def parse(self, str_expression):
+        str_expression = self.unbox(str_expression.strip())
+
         atomic = self.try_parse_atomic(str_expression)
         if atomic is not None:
             return atomic
@@ -35,8 +50,6 @@ class Parser:
         if binary is not None:
             return binary
 
-        return None
-
     def try_parse_atomic(self, str_expression):
         """
         Parses an atomic expression
@@ -45,14 +58,13 @@ class Parser:
         >>> p = Parser()
         >>> expr = 'P(x, y)'
         >>> atomic = p.try_parse_atomic(expr)
-        >>> tuple(element.name for element in atomic.element)
+        >>> tuple(arg.name for arg in atomic.arguments)
         ('x', 'y')
 
         >>> expr = 'P(x, y) & Q(z)'
         >>> p.try_parse_atomic(expr)
 
         """
-        str_expression = str_expression.strip()
         pattern = '^\w\(\s*\w*(,\s*\w+\s*)*\)$'
         match = re.match(pattern, str_expression)
         if match:
@@ -68,11 +80,10 @@ class Parser:
                               if x]
 
             p = predicate.Predicate(predicate_name)
-            v = tuple(variable.Variable(v) for v in variable_names)
+            args = tuple(variable.Variable(x) if x[0].isupper()
+                         else constant.Constant(x) for x in variable_names)
 
-            return atomic.Atomic(p, v)
-        else:
-            return None
+            return atomic.Atomic(p, *args)
 
     def try_parse_negation(self, str_expression):
         """
@@ -80,111 +91,105 @@ class Parser:
         If the expression does not match, returns None
 
         >>> p = Parser()
-        >>> expr = '¬(P(x, y))'
+        >>> expr = '¬P(a, Y)'
         >>> negation = p.try_parse_negation(expr)
         >>> atomic = negation.expr
         >>> atomic.predicate.name
         'P'
-        >>> tuple(element.name for element in atomic.element)
-        ('x', 'y')
+        >>> tuple(arg.name for arg in atomic.arguments)
+        ('a', 'Y')
 
         >>> expr = 'P(x, y) & Q(z)'
         >>> p.try_parse_negation(expr)
 
         """
-        str_expression = str_expression.strip()
-        pattern = '^¬\(.*\)$'
-        match = re.match(pattern, str_expression)
-        if match:
-            opening_parenthesis_idx = str_expression.index('(')
-            closing_parenthesis_idx = str_expression.rindex(')')
-
-            str_inner_expression = str_expression[opening_parenthesis_idx + 1:
-                                                  closing_parenthesis_idx]
-
+        if str_expression[0] == '¬':
+            str_inner_expression = str_expression[1:]
             expr = self.parse(str_inner_expression)
+
             if expr:
                 return negation.Negation(expr)
-
-        return None
-
-    def find_closing_parenthesis(self, text):
-        """
-        Gets the first closing parenthesis of a text
-        First output is the parenthesis, second is a tuple with indices
-
-        >>> p = Parser()
-        >>> p.find_closing_parenthesis('(Hey()),())')
-        ('(Hey())', (0, 6))
-
-        >>> p.find_closing_parenthesis('Hey(((')
-
-        """
-        start = -1
-        stack = 0
-        for index in range(len(text)):
-            if text[index] == '(':
-                if start < 0:
-                    start = index
-                stack += 1
-            if text[index] == ')':
-                stack -= 1
-            if stack == 0 and start >= 0:
-                break
-
-        if stack == 0 and start >= 0:
-                return (text[start:index + 1], (start, index))
-        else:
-            return None
 
     def try_parse_binary(self, str_expression):
         """
         Parses either a conjunction or disjunction
 
         >>> p = Parser()
-        >>> expr = '(P(x)) & (P(y))'
+        >>> expr = 'P(X) & P(Y)'
         >>> res = p.try_parse_binary(expr)
         >>> type(res) == conjunction.Conjunction
         True
         >>> res.expr1.predicate.name
         'P'
-        >>> tuple(x.name for x in res.expr2.element)
-        ('y',)
+        >>> tuple(x.name for x in res.expr1.arguments)
+        ('X',)
 
-        >>> expr = '(P(x)) | (Q(x))'
+        >>> expr = 'P(X) | Q(Y)'
         >>> res = p.try_parse_binary(expr)
         >>> type(res) == disjunction.Disjunction
         True
         >>> res.expr1.predicate.name
         'P'
-        >>> tuple(x.name for x in res.expr2.element)
-        ('x',)
+        >>> tuple(x.name for x in res.expr2.arguments)
+        ('Y',)
         """
-        str_expression = str_expression.strip()
-        result = self.find_closing_parenthesis(str_expression)
+        str_first_expression = self.grab_first_expression(str_expression)
 
-        if result:
-            (parenthesis, indices) = result
-            if indices[0] == 0:
-                remainder = str_expression[indices[1] + 1:]
-                result2 = self.find_closing_parenthesis(remainder)
+        if str_first_expression:
+            remainder = str_expression[len(str_first_expression):].strip()
+            operator = remainder[0]
 
-                if result2:
-                    operator = remainder[:result2[1][0]].strip()
-                    str_first_expression = result[0][1: -1]
-                    str_second_expression = result2[0][1: -1]
+            if operator in ('&', '|'):
+                str_second_expression = remainder[1:]
+                # self.grab_first_expression(remainder[1:])
 
-                    if operator in ('&', '|'):
-                        expr1 = self.parse(str_first_expression)
-                        expr2 = self.parse(str_second_expression)
+                if str_second_expression:
+                    expr1 = self.parse(str_first_expression)
+                    expr2 = self.parse(str_second_expression)
 
-                        if expr1 and expr2:
-                            if operator is '&':
-                                return conjunction.Conjunction(expr1, expr2)
-                            elif operator is '|':
-                                return disjunction.Disjunction(expr1, expr2)
+                    if expr1 and expr2:
+                        if operator == '&':
+                            return conjunction.Conjunction(expr1, expr2)
+                        elif operator == '|':
+                            return disjunction.Disjunction(expr1, expr2)
 
-        return None
+    def grab_first_expression(self, str_expression):
+        """
+        Grab the first section that could be an expression from a string
+
+        >>> p = Parser()
+        >>> p.grab_first_expression('P(x) & P(y)')
+        'P(x)'
+
+        >>> p.grab_first_expression('abc(def()), asd')
+        'abc(def())'
+        """
+        if '(' in str_expression:
+            start = str_expression.index('(')
+            end = self.closure(str_expression, start)
+            if end:
+                return str_expression[:end + 1]
+
+    def closure(self, str_expression, start=0):
+        """
+        Gets the index at which parenthesis are balanced
+
+        >>> p = Parser()
+        >>> p.closure('(((,))()),()')
+        8
+
+        >>> p.closure('(((')
+
+        """
+        stack = 1
+        for idx in range(start + 1, len(str_expression)):
+            if str_expression[idx] == '(':
+                stack += 1
+            elif str_expression[idx] == ')':
+                stack -= 1
+
+            if stack == 0:
+                return idx
 
 
 def test():

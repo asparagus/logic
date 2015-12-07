@@ -46,9 +46,12 @@ class Conjunction(expression.Expression):
         >>> f = expression.Contradiction()
         >>> a = Conjunction(t, f)
         >>> str(a)
-        '(T) & (F)'
+        '(T & F)'
         """
-        return '(%s) & (%s)' % (self.expr1, self.expr2)
+        return '(%s & %s)' % (self.expr1, self.expr2)
+
+    def type(self):
+        return 'Conjunction'
 
 
 def test():

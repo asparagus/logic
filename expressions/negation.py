@@ -37,9 +37,12 @@ class Negation(expression.Expression):
 
         >>> a = Negation(expression.Tautology())
         >>> str(a)
-        '¬(T)'
+        '(¬T)'
         """
-        return '¬(%s)' % str(self.expr)
+        return '(¬%s)' % str(self.expr)
+
+    def type(self):
+        return 'Negation'
 
 
 def test():
