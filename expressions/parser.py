@@ -36,6 +36,9 @@ class Parser:
         return str_expression
 
     def parse(self, str_expression):
+        """
+        Parses a given expression
+        """
         str_expression = self.unbox(str_expression.strip())
 
         atomic = self.try_parse_atomic(str_expression)
@@ -117,8 +120,8 @@ class Parser:
         >>> p = Parser()
         >>> expr = 'P(X) & P(Y)'
         >>> res = p.try_parse_binary(expr)
-        >>> type(res) == conjunction.Conjunction
-        True
+        >>> res.type()
+        'Conjunction'
         >>> res.expr1.predicate.name
         'P'
         >>> tuple(x.name for x in res.expr1.arguments)
@@ -126,49 +129,147 @@ class Parser:
 
         >>> expr = 'P(X) | Q(Y)'
         >>> res = p.try_parse_binary(expr)
-        >>> type(res) == disjunction.Disjunction
-        True
+        >>> res.type()
+        'Disjunction'
         >>> res.expr1.predicate.name
         'P'
         >>> tuple(x.name for x in res.expr2.arguments)
         ('Y',)
+
+        >>> expr = 'P(x) & P(y) & P(z)'
+        >>> res = p.try_parse_binary(expr)
+        >>> res.type()
+        'Conjunction'
+
+        >>> res.expr2.predicate.name
+        'P'
+        >>> tuple(x.name for x in res.expr2.arguments)
+        ('z',)
         """
-        str_first_expression = self.grab_first_expression(str_expression)
+        str_last_expression = self.grab_last_expression(str_expression)
 
-        if str_first_expression:
-            remainder = str_expression[len(str_first_expression):].strip()
-            operator = remainder[0]
+        if str_last_expression:
+            remainder = str_expression[:-len(str_last_expression)].strip()
+            if len(remainder) > 0:
+                operator = remainder[-1]
 
-            if operator in ('&', '|'):
-                str_second_expression = remainder[1:]
-                # self.grab_first_expression(remainder[1:])
+                if operator in ('&', '|'):
+                    str_first_expression = remainder[:-1]
+                    # self.grab_first_expression(remainder[1:])
 
-                if str_second_expression:
-                    expr1 = self.parse(str_first_expression)
-                    expr2 = self.parse(str_second_expression)
+                    if str_first_expression:
+                        expr1 = self.parse(str_first_expression)
+                        expr2 = self.parse(str_last_expression)
 
-                    if expr1 and expr2:
-                        if operator == '&':
-                            return conjunction.Conjunction(expr1, expr2)
-                        elif operator == '|':
-                            return disjunction.Disjunction(expr1, expr2)
+                        if expr1 and expr2:
+                            if operator == '&':
+                                return conjunction.Conjunction(expr1, expr2)
+                            elif operator == '|':
+                                return disjunction.Disjunction(expr1, expr2)
 
-    def grab_first_expression(self, str_expression):
+    # def try_parse_binary(self, str_expression):
+    #     """
+    #     Parses either a conjunction or disjunction
+
+    #     >>> p = Parser()
+    #     >>> expr = 'P(X) & P(Y)'
+    #     >>> res = p.try_parse_binary(expr)
+    #     >>> type(res) == conjunction.Conjunction
+    #     True
+    #     >>> res.expr1.predicate.name
+    #     'P'
+    #     >>> tuple(x.name for x in res.expr1.arguments)
+    #     ('X',)
+
+    #     >>> expr = 'P(X) | Q(Y)'
+    #     >>> res = p.try_parse_binary(expr)
+    #     >>> type(res) == disjunction.Disjunction
+    #     True
+    #     >>> res.expr1.predicate.name
+    #     'P'
+    #     >>> tuple(x.name for x in res.expr2.arguments)
+    #     ('Y',)
+    #     """
+    #     str_first_expression = self.grab_first_expression(str_expression)
+
+    #     if str_first_expression:
+    #         remainder = str_expression[len(str_first_expression):].strip()
+    #         operator = remainder[0]
+
+    #         if operator in ('&', '|'):
+    #             str_second_expression = remainder[1:]
+    #             # self.grab_first_expression(remainder[1:])
+
+    #             if str_second_expression:
+    #                 expr1 = self.parse(str_first_expression)
+    #                 expr2 = self.parse(str_second_expression)
+
+    #                 if expr1 and expr2:
+    #                     if operator == '&':
+    #                         return conjunction.Conjunction(expr1, expr2)
+    #                     elif operator == '|':
+    #                         return disjunction.Disjunction(expr1, expr2)
+
+    # def grab_first_expression(self, str_expression):
+    #     """
+    #     Grab the first section that could be an expression from a string
+
+    #     >>> p = Parser()
+    #     >>> p.grab_first_expression('P(x) & P(y)')
+    #     'P(x)'
+
+    #     >>> p.grab_first_expression('abc(def()), asd')
+    #     'abc(def())'
+    #     """
+    #     if '(' in str_expression:
+    #         start = str_expression.index('(')
+    #         end = self.closure(str_expression, start)
+    #         if end:
+    #             return str_expression[:end + 1]
+
+    def grab_last_expression(self, str_expression):
         """
-        Grab the first section that could be an expression from a string
+        Grab the last section that could be an expression from a string
 
         >>> p = Parser()
-        >>> p.grab_first_expression('P(x) & P(y)')
-        'P(x)'
+        >>> p.grab_last_expression('P(x) & P(y)')
+        'P(y)'
 
-        >>> p.grab_first_expression('abc(def()), asd')
-        'abc(def())'
+        >>> p.grab_last_expression('abc(def()), asd')
+
         """
-        if '(' in str_expression:
-            start = str_expression.index('(')
-            end = self.closure(str_expression, start)
-            if end:
-                return str_expression[:end + 1]
+        if len(str_expression) > 0 and str_expression[-1] == ')':
+            start = self.backwards_closure(str_expression)
+            if start:
+                idx = start - 1
+                while idx >= -len(str_expression):
+                    c = str_expression[idx]
+                    if c not in ['_.-'] and not c.isalnum():
+                        return str_expression[idx + 1:]
+
+                    idx -= 1
+
+    def backwards_closure(self, str_expression, end=-1):
+        """
+        Gets the index at which parenthesis are balanced
+
+        >>> p = Parser()
+        >>> p.backwards_closure('(((,))()),()')
+        -2
+        """
+        idx = end - 1
+        stack = 1
+
+        while idx >= -len(str_expression):
+            if str_expression[idx] == ')':
+                stack += 1
+            elif str_expression[idx] == '(':
+                stack -= 1
+
+            if stack == 0:
+                return idx
+
+            idx -= 1
 
     def closure(self, str_expression, start=0):
         """
