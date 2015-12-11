@@ -5,12 +5,12 @@ if __package__ is not None:
 import expression
 
 
-class Disjunction(expression.Expression):
+class Implication(expression.Expression):
     def __init__(self, expr1, expr2):
         """
-        Creates a new Disjunction off expressions 1 and 2
+        Creates a new Implication off expressions 1 and 2
 
-        >>> e = Disjunction(1, 2)
+        >>> e = Implication(1, 2)
         >>> e.expr1
         1
         >>> e.expr2 == 2
@@ -21,22 +21,22 @@ class Disjunction(expression.Expression):
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Disjunction expression
-        Returns true if either expressions p or q are true
+        Evaluates the Conjunction expression
+        Returns true if both expressions are true
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
-        >>> a = Disjunction(t, f)
-        >>> a.eval()
-        True
-        >>> a = Disjunction(t, t)
-        >>> a.eval()
-        True
-        >>> a = Disjunction(f, f)
+        >>> a = Implication(t, f)
         >>> a.eval()
         False
+        >>> a = Implication(t, t)
+        >>> a.eval()
+        True
+        >>> a = Implication(f, f)
+        >>> a.eval()
+        True
         """
-        return (self.expr1.eval(knowledge) or self.expr2.eval(knowledge))
+        return (not self.expr1.eval(knowledge) or self.expr2.eval(knowledge))
 
     def __str__(self):
         """
@@ -44,14 +44,14 @@ class Disjunction(expression.Expression):
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
-        >>> a = Disjunction(t, f)
+        >>> a = Implication(t, f)
         >>> str(a)
-        '(T | F)'
+        '(T > F)'
         """
-        return '(%s | %s)' % (self.expr1, self.expr2)
+        return '(%s > %s)' % (self.expr1, self.expr2)
 
     def type(self):
-        return 'Disjunction'
+        return 'Implication'
 
     def __eq__(self, other):
         return type(self) == type(other) and\

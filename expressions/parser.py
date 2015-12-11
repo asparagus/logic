@@ -4,6 +4,7 @@ if __package__ is not None:
 
 import conjunction
 import disjunction
+import implication
 import negation
 import atomic
 
@@ -153,7 +154,7 @@ class Parser:
             if len(remainder) > 0:
                 operator = remainder[-1]
 
-                if operator in ('&', '|'):
+                if operator in ('&', '|', '>'):
                     str_first_expression = remainder[:-1]
                     # self.grab_first_expression(remainder[1:])
 
@@ -166,6 +167,8 @@ class Parser:
                                 return conjunction.Conjunction(expr1, expr2)
                             elif operator == '|':
                                 return disjunction.Disjunction(expr1, expr2)
+                            elif operator == '>':
+                                return implication.Implication(expr1, expr2)
 
     # def try_parse_binary(self, str_expression):
     #     """

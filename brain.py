@@ -7,6 +7,7 @@ import expressions.constant
 import expressions.atomic
 import expressions.negation
 import expressions.conjunction
+import expressions.parser
 
 
 class Brain:
@@ -18,7 +19,10 @@ class Brain:
         >>> a.knowledge
         {}
         """
-        self.knowledge = {}
+        self.parser = expressions.parser.Parser()
+        self.knowledge = set()
+        self.rules = {}
+        self.memory = {}
 
     def eval(self, e):
         """
@@ -29,7 +33,7 @@ class Brain:
         >>> c = expressions.constant.Constant('c')
         >>> d = expressions.constant.Constant('d')
         >>> b = Brain()
-        >>> b.knowledge = {'P': {('c',): True}}
+        >>> b.knowledge = {'P': {('c',)}}
         >>> p = expressions.atomic.Atomic(p, c)
         >>> b.eval(p)
         True
@@ -40,6 +44,39 @@ class Brain:
         result = e.eval(self.knowledge)
         print('%s => %s' % (e, result))
         return result
+
+    def add_rule(self, antecedent, consequent):
+        """
+        Adds a give antecedent -> consequent rule to the brain
+        """
+        if antecedent not in self.rules:
+            self.rules[antecedent] = set()
+
+        self.rules[antecedent].add(consequent)
+
+        if self.eval(antecedent):
+            if consequent not in self.knowledge:
+                self.learn(consequent)
+
+    def add_atomic(self, expr):
+        """
+        Adds a given expression to the knowledge base
+        """
+        self.knowledge.add(expr)
+
+        if expr in self.memory:
+            memory = self.memory[expr]
+            if memory in self.knowledge:
+                if memory in self.rules:
+                    for consequent in self.rules[memory]:
+                        self.learn(consequent)
+
+        if expr in self.rules:
+            for consequent in self.rules[expr]:
+                self.learn(consequent)
+
+    def add_memory(self, memory, reminder):
+        self.memory[reminder] = memory
 
     def learn(self, e):
         """
@@ -59,11 +96,19 @@ class Brain:
             self.learn(e.expr2)
 
         elif e.type() == 'Atomic':
-            p = e.predicate.name
-            if p not in self.knowledge:
-                self.knowledge[p] = {}
+            self.add_atomic(e)
+            # p = e.predicate.name
+            # if p not in self.knowledge:
+            #     self.knowledge[p] = {}
 
-            self.knowledge[p][tuple(x.name for x in e.arguments)] = True
+            # self.knowledge[p][tuple(x.name for x in e.arguments)] = True
+
+        elif e.type() == 'Implication':
+            self.add_rule(e.expr1, e.expr2)
+
+        elif e.type() == 'Disjunction':
+            self.add_rule(expressions.negation.Negation(e.expr1), e.expr2)
+            self.add_rule(expressions.negation.Negation(e.expr2), e.expr1)
 
         else:
             print('None')

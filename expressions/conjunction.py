@@ -53,6 +53,14 @@ class Conjunction(expression.Expression):
     def type(self):
         return 'Conjunction'
 
+    def __eq__(self, other):
+        return type(self) == type(other) and\
+            self.expr1 == other.expr1 and\
+            self.expr2 == other.expr2
+
+    def __hash__(self):
+        return hash((type(self), self.expr1, self.expr2))
+
 
 def test():
     print('Testing')

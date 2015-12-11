@@ -20,6 +20,12 @@ class Variable:
         """
         return self.name
 
+    def __eq__(self, other):
+        return type(other) == type(self)
+
+    def __hash__(self):
+        return 0
+
 
 def test():
     print('Testing')

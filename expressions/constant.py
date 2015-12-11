@@ -20,6 +20,12 @@ class Constant:
         """
         return self.name
 
+    def __eq__(self, other):
+        return type(self) == type(self) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
+
 
 def test():
     print('Testing')

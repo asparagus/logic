@@ -11,6 +11,12 @@ class Expression:
     def type(self):
         return 'Expression'
 
+    def __eq__(self, other):
+        return False
+
+    def __hash__(self):
+        return 0
+
 
 class Contradiction(Expression):
     def __init__(self):

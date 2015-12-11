@@ -44,6 +44,13 @@ class Negation(expression.Expression):
     def type(self):
         return 'Negation'
 
+    def _eq__(self, other):
+        return type(self) == type(other) and\
+            self.expr == other.expr
+
+    def __hash__(self):
+        return hash((type(self), self.expr))
+
 
 def test():
     print('Testing')

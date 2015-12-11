@@ -40,13 +40,14 @@ class Atomic(expression.Expression):
         >>> a.eval()
         False
         """
-        pred = self.predicate.name
-        args = tuple(arg.name for arg in self.arguments)
-        if pred in knowledge:
-            if args in knowledge[pred]:
-                return True
+        return self in knowledge
+        # pred = self.predicate.name
+        # args = tuple(arg.name for arg in self.arguments)
+        # if pred in knowledge:
+        #     if args in knowledge[pred]:
+        #         return True
 
-        return False
+        # return False
 
     def __str__(self):
         """
@@ -68,6 +69,15 @@ class Atomic(expression.Expression):
 
     def type(self):
         return 'Atomic'
+
+    def __eq__(self, other):
+        if other.type() == self.type():
+            return self.predicate == other.predicate and\
+                self.arguments == other.arguments
+        return False
+
+    def __hash__(self):
+        return hash((type(self), self.predicate, self.arguments))
 
 
 def test():
