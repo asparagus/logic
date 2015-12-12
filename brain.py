@@ -17,7 +17,7 @@ class Brain:
 
         >>> a = Brain()
         >>> a.knowledge
-        {}
+        set()
         """
         self.parser = expressions.parser.Parser()
         self.knowledge = set()
@@ -33,8 +33,8 @@ class Brain:
         >>> c = expressions.constant.Constant('c')
         >>> d = expressions.constant.Constant('d')
         >>> b = Brain()
-        >>> b.knowledge = {'P': {('c',)}}
         >>> p = expressions.atomic.Atomic(p, c)
+        >>> b.knowledge = {p}
         >>> b.eval(p)
         True
         >>> q = expressions.atomic.Atomic(q, d)
@@ -42,7 +42,7 @@ class Brain:
         False
         """
         result = e.eval(self.knowledge)
-        print('%s => %s' % (e, result))
+        # print('%s => %s' % (e, result))
         return result
 
     def add_rule(self, antecedent, consequent):
@@ -90,18 +90,13 @@ class Brain:
         >>> b.eval(a)
         True
         """
-        print('Brain <- %s' % str(e))
+        # print('Brain <- %s' % str(e))
         if e.type() == 'Conjunction':
             self.learn(e.expr1)
             self.learn(e.expr2)
 
         elif e.type() == 'Atomic':
             self.add_atomic(e)
-            # p = e.predicate.name
-            # if p not in self.knowledge:
-            #     self.knowledge[p] = {}
-
-            # self.knowledge[p][tuple(x.name for x in e.arguments)] = True
 
         elif e.type() == 'Implication':
             self.add_rule(e.expr1, e.expr2)
