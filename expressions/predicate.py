@@ -20,9 +20,16 @@ class Predicate:
         return self.name
 
     def __eq__(self, other):
+        """
+        Compares two predicates to check if they're equal
+        Two predicates are equal when they have the same name
+        """
         return type(self) == type(other) and self.name == other.name
 
     def __hash__(self):
+        """
+        Gets the hash of this predicate
+        """
         return hash(self.name)
 
 

@@ -29,25 +29,21 @@ class Atomic(expression.Expression):
         """
         Evaluates an atomic expression on a given knowledge base
 
-        >>> import variable
+        >>> import constant
         >>> import predicate
         >>> p = predicate.Predicate('P')
-        >>> x = variable.Variable('X')
-        >>> a = Atomic(p, x)
-        >>> k = {'P': {('X',): True}}
+        >>> c = constant.Constant('c')
+        >>> a = Atomic(p, c)
+        >>> k = {a}
         >>> a.eval(k)
         True
         >>> a.eval()
         False
+        >>> b = Atomic(p, c)
+        >>> b.eval(k)
+        True
         """
         return self in knowledge
-        # pred = self.predicate.name
-        # args = tuple(arg.name for arg in self.arguments)
-        # if pred in knowledge:
-        #     if args in knowledge[pred]:
-        #         return True
-
-        # return False
 
     def __str__(self):
         """
@@ -68,15 +64,33 @@ class Atomic(expression.Expression):
                                                      ))
 
     def type(self):
+        """
+        Returns the type of this expression
+        """
         return 'Atomic'
 
     def __eq__(self, other):
+        """
+        Compares two expressions to check if they're equal
+
+        >>> import constant
+        >>> import predicate
+        >>> p = predicate.Predicate('P')
+        >>> c = constant.Constant('c')
+        >>> a = Atomic(p, c)
+        >>> b = Atomic(p, c)
+        >>> a == b
+        True
+        """
         if other.type() == self.type():
             return self.predicate == other.predicate and\
                 self.arguments == other.arguments
         return False
 
     def __hash__(self):
+        """
+        Gets the hash of this atomic expression
+        """
         return hash((type(self), self.predicate, self.arguments))
 
 

@@ -21,9 +21,17 @@ class Variable:
         return self.name
 
     def __eq__(self, other):
-        return type(other) == type(self)
+        """
+        Compares two variables to check if they're equal
+        Two variables are equal when they have the same name
+        """
+        return self.name == other.name
 
     def __hash__(self):
+        """
+        Gets the hash of this variable
+        All variables have the same hash
+        """
         return 0
 
 

@@ -51,14 +51,41 @@ class Implication(expression.Expression):
         return '(%s > %s)' % (self.expr1, self.expr2)
 
     def type(self):
+        """
+        Returns the type of this expression
+        """
         return 'Implication'
 
     def __eq__(self, other):
+        """
+        Compares two expressions to check if they're equal
+
+        >>> import constant
+        >>> import predicate
+        >>> import atomic
+        >>> p = predicate.Predicate('P')
+        >>> c = constant.Constant('c')
+        >>> d = constant.Constant('d')
+        >>> e = constant.Constant('e')
+        >>> P_c = atomic.Atomic(p, c)
+        >>> P_d = atomic.Atomic(p, d)
+        >>> P_e = atomic.Atomic(p, e)
+        >>> imp1 = Implication(P_c, P_d)
+        >>> imp2 = Implication(P_c, P_d)
+        >>> imp1 == imp2
+        True
+        >>> imp3 = Implication(P_c, P_e)
+        >>> imp1 == imp3
+        False
+        """
         return type(self) == type(other) and\
             self.expr1 == other.expr1 and\
             self.expr2 == other.expr2
 
     def __hash__(self):
+        """
+        Gets the hash of this implication
+        """
         return hash((type(self), self.expr1, self.expr2))
 
 

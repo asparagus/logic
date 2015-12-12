@@ -51,14 +51,41 @@ class Conjunction(expression.Expression):
         return '(%s & %s)' % (self.expr1, self.expr2)
 
     def type(self):
+        """
+        Returns the type of this expression
+        """
         return 'Conjunction'
 
     def __eq__(self, other):
+        """
+        Compares two expressions to check if they're equal
+
+        >>> import constant
+        >>> import predicate
+        >>> import atomic
+        >>> p = predicate.Predicate('P')
+        >>> c = constant.Constant('c')
+        >>> d = constant.Constant('d')
+        >>> e = constant.Constant('e')
+        >>> P_c = atomic.Atomic(p, c)
+        >>> P_d = atomic.Atomic(p, d)
+        >>> P_e = atomic.Atomic(p, e)
+        >>> conj1 = Conjunction(P_c, P_d)
+        >>> conj2 = Conjunction(P_c, P_d)
+        >>> conj1 == conj2
+        True
+        >>> conj3 = Conjunction(P_c, P_e)
+        >>> conj1 == conj3
+        False
+        """
         return type(self) == type(other) and\
             self.expr1 == other.expr1 and\
             self.expr2 == other.expr2
 
     def __hash__(self):
+        """
+        Gets the hash of this conjunction
+        """
         return hash((type(self), self.expr1, self.expr2))
 
 

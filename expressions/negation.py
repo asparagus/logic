@@ -42,13 +42,36 @@ class Negation(expression.Expression):
         return '(¬%s)' % str(self.expr)
 
     def type(self):
+        """
+        Returns the type of this expression
+        """
         return 'Negation'
 
-    def _eq__(self, other):
-        return type(self) == type(other) and\
-            self.expr == other.expr
+    def __eq__(self, other):
+        """
+        Compares two expressions to check if they're equal
+
+        >>> import constant
+        >>> import predicate
+        >>> import atomic
+        >>> p = predicate.Predicate('P')
+        >>> c = constant.Constant('c')
+        >>> d = constant.Constant('d')
+        >>> a = atomic.Atomic(p, c)
+        >>> b = atomic.Atomic(p, d)
+        >>> na = Negation(a)
+        >>> nb = Negation(b)
+        >>> na == nb
+        False
+        >>> na == Negation(a)
+        True
+        """
+        return self.type() == other.type() and self.expr == other.expr
 
     def __hash__(self):
+        """
+        Gets the hash of this implication
+        """
         return hash((type(self), self.expr))
 
 
