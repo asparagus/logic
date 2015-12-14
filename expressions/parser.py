@@ -69,7 +69,7 @@ class Parser:
         >>> p.try_parse_atomic(expr)
 
         """
-        pattern = '^\w\(\s*\w*(,\s*\w+\s*)*\)$'
+        pattern = '^\w+\(\s*\w*(,\s*\w+\s*)*\)$'
         match = re.match(pattern, str_expression)
         if match:
             opening_parenthesis_idx = str_expression.index('(')

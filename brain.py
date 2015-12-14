@@ -108,6 +108,17 @@ class Brain:
         else:
             print('None')
 
+    def __str__(self):
+        knowledge_str = str({str(e) for e in self.knowledge})
+        rule_str = str({str(p): [str(q) for q in self.rules[p]]
+                        for p in self.rules})
+        reminder_str = str({str(p): self.memory[p] for p in self.memory})
+
+        result_str = "Knowledge:\n%s\n\nRules:\n%s\n\nReminders:\n%s\n\n" %\
+                     (knowledge_str, rule_str, reminder_str)
+
+        return result_str
+
 
 def test():
     print('Testing')
