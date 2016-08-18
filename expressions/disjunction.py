@@ -1,14 +1,20 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Disjunction expression class."""
+from __future__ import unicode_literals
 import expression
 
 
 class Disjunction(expression.Expression):
+    """
+    A disjunction expression.
+
+    Represents the logical OR between two sub-expressions.
+    """
+
     def __init__(self, expr1, expr2):
         """
-        Creates a new Disjunction off expressions 1 and 2
+        Create a new Disjunction off expressions 1 and 2.
 
         >>> e = Disjunction(1, 2)
         >>> e.expr1
@@ -21,8 +27,9 @@ class Disjunction(expression.Expression):
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Disjunction expression
-        Returns true if either expressions p or q are true
+        Evaluate the Disjunction expression.
+
+        Returns true if either expressions p or q are true.
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
@@ -40,25 +47,23 @@ class Disjunction(expression.Expression):
 
     def __str__(self):
         """
-        String representation to print
+        String representation to print.
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
         >>> a = Disjunction(t, f)
-        >>> str(a)
-        '(T | F)'
+        >>> print(a)
+        (T | F)
         """
         return '(%s | %s)' % (self.expr1, self.expr2)
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Disjunction'
 
     def __eq__(self, other):
         """
-        Compares two expressions to check if they're equal
+        Compare two expressions to check if they're equal.
 
         >>> import constant
         >>> import predicate
@@ -83,13 +88,12 @@ class Disjunction(expression.Expression):
             self.expr2 == other.expr2
 
     def __hash__(self):
-        """
-        Gets the hash of this disjunction
-        """
+        """Get the hash of this disjunction."""
         return hash((type(self), self.expr1, self.expr2))
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

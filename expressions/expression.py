@@ -1,51 +1,61 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""
+This module contains the classes Expression, Contradiction and Tautology.
+
+The Expression class is the base for all logic expressions.
+Contradiction and Tautology are just constant examples.
+"""
+from __future__ import unicode_literals
+
+
 class Expression:
+    """
+    This class is the parent for all logic expressions.
+
+    Provides the method signature for all methods expected from an expression:
+    eval, str, type, eq, hash
+    """
+
     def __init__(self):
-        """
-        Initializes the expression
-        """
+        """Initialize the expression."""
         raise Exception('Non-subclass expressions cannot be initialized')
 
     def eval(self, knowledge={}):
-        """
-        Evaluates the expression
-        """
+        """Evaluate the expression."""
         raise Exception('Non-subclass expressions cannot be evaluated')
 
     def __str__(self):
-        """
-        String representation to print
-        """
+        """String representation to print."""
         raise Exception('Non-subclass expressions cannot be parsed')
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         raise Exception('Non-subclass expressions do not have a type')
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
-        """
+        """Compare two expressions to check if they're equal."""
         raise Exception('Non-subclass expressions cannot be compared')
 
     def __hash__(self):
-        """
-        Gets the hash of this expression
-        """
+        """Get the hash of this expression."""
         return 0
 
 
 class Contradiction(Expression):
+    """A constant expression. Contradiction is always False."""
+
     def __init__(self):
         """
-        Creates a new Contradiction expression, which always evaluates to false
+        Create a new Contradiction instance.
+
+        It always evaluates to false.
         """
         pass
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Contradiction, returns false
+        Evaluate the Contradiction, returns false.
 
         >>> a = Contradiction()
         >>> a.eval()
@@ -54,40 +64,41 @@ class Contradiction(Expression):
         return False
 
     def __str__(self):
-        """
-        String representation to print
-        """
+        """String representation to print."""
         return 'F'
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Contradiction'
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
-        """
+        """Compare two expressions to check if they're equal."""
         return type(self) == type(other)
 
     def __hash__(self):
+        """Get the hash of this expression.
+
+        >>> c = Contradiction()
+        >>> hash(c) == hash('F')
+        True
         """
-        Gets the hash of this expression
-        """
-        return hash('F')
+        return hash(str(self))
 
 
 class Tautology(Expression):
+    """A constant expression. Tautology is always True."""
+
     def __init__(self):
         """
-        Creates a new Tautology expression, which always evaluates to true
+        Create a new Tautology expression.
+
+        It always evaluates to true.
         """
         pass
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Tautology, returns true
+        Evaluate the Tautology, returns true.
 
         >>> a = Tautology()
         >>> a.eval()
@@ -96,31 +107,30 @@ class Tautology(Expression):
         return True
 
     def __str__(self):
-        """
-        String representation to print
-        """
+        """String representation to print."""
         return 'T'
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Tautology'
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
-        """
+        """Compare two expressions to check if they're equal."""
         return type(self) == type(other)
 
     def __hash__(self):
         """
-        Gets the hash of this expression
+        Get the hash of this expression.
+
+        >>> t = Tautology()
+        >>> hash(t) == hash('T')
+        True
         """
-        return hash('T')
+        return hash(str(self))
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

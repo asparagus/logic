@@ -1,6 +1,8 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Parser class."""
+from __future__ import unicode_literals
+import re
 
 import conjunction
 import disjunction
@@ -12,23 +14,20 @@ import predicate
 import variable
 import constant
 
-import re
-
 
 class Parser:
+    """Parser class. Parses expressions from strings."""
+
     def __init__(self):
-        """
-        Initializes an instance of Parser
-        """
+        """Initialize an instance of Parser."""
         pass
 
     def unbox(self, str_expression):
-        """
-        Removes unnecessary parenthesis
+        """Remove unnecessary parenthesis.
 
         >>> p = Parser()
-        >>> p.unbox('((hey,))')
-        'hey,'
+        >>> p.unbox('((hey,))') == 'hey,'
+        True
         """
         while str_expression[0] == '(' and\
                 self.closure(str_expression) == len(str_expression) - 1:
@@ -37,9 +36,7 @@ class Parser:
         return str_expression
 
     def parse(self, str_expression):
-        """
-        Parses a given expression
-        """
+        """Parse a given expression."""
         str_expression = self.unbox(str_expression.strip())
 
         atomic = self.try_parse_atomic(str_expression)
@@ -56,14 +53,15 @@ class Parser:
 
     def try_parse_atomic(self, str_expression):
         """
-        Parses an atomic expression
-        If the expression does not match, returns None
+        Parse an atomic expression.
+
+        If the expression does not match, returns None.
 
         >>> p = Parser()
         >>> expr = 'P(x, y)'
         >>> atomic = p.try_parse_atomic(expr)
-        >>> tuple(arg.name for arg in atomic.arguments)
-        ('x', 'y')
+        >>> tuple(arg.name for arg in atomic.arguments) == ('x', 'y')
+        True
 
         >>> expr = 'P(x, y) & Q(z)'
         >>> p.try_parse_atomic(expr)
@@ -91,17 +89,18 @@ class Parser:
 
     def try_parse_negation(self, str_expression):
         """
-        Parses a negation expression
-        If the expression does not match, returns None
+        Parse a negation expression.
+
+        If the expression does not match, returns None.
 
         >>> p = Parser()
         >>> expr = '¬P(a, Y)'
         >>> negation = p.try_parse_negation(expr)
         >>> atomic = negation.expr
         >>> atomic.predicate.name
-        'P'
-        >>> tuple(arg.name for arg in atomic.arguments)
-        ('a', 'Y')
+        u'P'
+        >>> tuple(arg.name for arg in atomic.arguments) == ('a', 'Y')
+        True
 
         >>> expr = 'P(x, y) & Q(z)'
         >>> p.try_parse_negation(expr)
@@ -116,36 +115,36 @@ class Parser:
 
     def try_parse_binary(self, str_expression):
         """
-        Parses either a conjunction or disjunction
+        Parse either a conjunction or disjunction.
 
         >>> p = Parser()
         >>> expr = 'P(X) & P(Y)'
         >>> res = p.try_parse_binary(expr)
-        >>> res.type()
-        'Conjunction'
-        >>> res.expr1.predicate.name
-        'P'
-        >>> tuple(x.name for x in res.expr1.arguments)
-        ('X',)
+        >>> print(res.type())
+        Conjunction
+        >>> print(res.expr1.predicate.name)
+        P
+        >>> tuple(x.name for x in res.expr1.arguments) == ('X',)
+        True
 
         >>> expr = 'P(X) | Q(Y)'
         >>> res = p.try_parse_binary(expr)
-        >>> res.type()
-        'Disjunction'
-        >>> res.expr1.predicate.name
-        'P'
-        >>> tuple(x.name for x in res.expr2.arguments)
-        ('Y',)
+        >>> print(res.type())
+        Disjunction
+        >>> print(res.expr1.predicate.name)
+        P
+        >>> tuple(x.name for x in res.expr2.arguments) == ('Y',)
+        True
 
         >>> expr = 'P(x) & P(y) & P(z)'
         >>> res = p.try_parse_binary(expr)
-        >>> res.type()
-        'Conjunction'
+        >>> print(res.type())
+        Conjunction
 
-        >>> res.expr2.predicate.name
-        'P'
-        >>> tuple(x.name for x in res.expr2.arguments)
-        ('z',)
+        >>> print(res.expr2.predicate.name)
+        P
+        >>> tuple(x.name for x in res.expr2.arguments) == ('z',)
+        True
         """
         str_last_expression = self.grab_last_expression(str_expression)
 
@@ -172,11 +171,11 @@ class Parser:
 
     def grab_last_expression(self, str_expression):
         """
-        Grab the last section that could be an expression from a string
+        Grab the last section that could be an expression from a string.
 
         >>> p = Parser()
-        >>> p.grab_last_expression('P(x) & P(y)')
-        'P(y)'
+        >>> print(p.grab_last_expression('P(x) & P(y)'))
+        P(y)
 
         >>> p.grab_last_expression('abc(def()), asd')
 
@@ -194,7 +193,7 @@ class Parser:
 
     def backwards_closure(self, str_expression, end=-1):
         """
-        Gets the index at which parenthesis are balanced
+        Get the index at which parenthesis are balanced.
 
         >>> p = Parser()
         >>> p.backwards_closure('(((,))()),()')
@@ -216,7 +215,7 @@ class Parser:
 
     def closure(self, str_expression, start=0):
         """
-        Gets the index at which parenthesis are balanced
+        Get the index at which parenthesis are balanced.
 
         >>> p = Parser()
         >>> p.closure('(((,))()),()')
@@ -237,6 +236,7 @@ class Parser:
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

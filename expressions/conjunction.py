@@ -1,14 +1,20 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Conjunction expression class."""
+from __future__ import unicode_literals
 import expression
 
 
 class Conjunction(expression.Expression):
+    """
+    A conjunction expression.
+
+    Represents the logical AND between two sub-expressions.
+    """
+
     def __init__(self, expr1, expr2):
         """
-        Creates a new Conjunction off expressions 1 and 2
+        Create a new Conjunction off expressions 1 and 2.
 
         >>> e = Conjunction(1, 2)
         >>> e.expr1
@@ -21,7 +27,8 @@ class Conjunction(expression.Expression):
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Conjunction expression
+        Evaluate the Conjunction expression.
+
         Returns true if both expressions are true
 
         >>> t = expression.Tautology()
@@ -40,25 +47,22 @@ class Conjunction(expression.Expression):
 
     def __str__(self):
         """
-        String representation to print
+        String representation to print.
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
         >>> a = Conjunction(t, f)
-        >>> str(a)
-        '(T & F)'
+        >>> print(a)
+        (T & F)
         """
         return '(%s & %s)' % (self.expr1, self.expr2)
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Conjunction'
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
+        """Compare two expressions to check if they're equal.
 
         >>> import constant
         >>> import predicate
@@ -83,13 +87,12 @@ class Conjunction(expression.Expression):
             self.expr2 == other.expr2
 
     def __hash__(self):
-        """
-        Gets the hash of this conjunction
-        """
+        """Get the hash of this conjunction."""
         return hash((type(self), self.expr1, self.expr2))
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

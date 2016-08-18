@@ -1,33 +1,35 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Atomic expression class."""
+from __future__ import unicode_literals
 import expression
 
 
 class Atomic(expression.Expression):
+    """Atomic expression class. Represents a simple statement."""
+
     def __init__(self, p, *x):
         """
-        Creates a new atomic expression with given predicate and arguments
+        Create a new atomic expression with given predicate and arguments.
 
         >>> import variable
         >>> import predicate
         >>> p = predicate.Predicate('P')
         >>> x = variable.Variable('X')
         >>> a = Atomic(p, x)
-        >>> a.predicate.name
-        'P'
+        >>> print(a.predicate.name)
+        P
         >>> len(a.arguments)
         1
-        >>> a.arguments[0].name
-        'X'
+        >>> print(a.arguments[0].name)
+        X
         """
         self.predicate = p
         self.arguments = x
 
     def eval(self, knowledge={}):
         """
-        Evaluates an atomic expression on a given knowledge base
+        Evaluate an atomic expression on a given knowledge base.
 
         >>> import constant
         >>> import predicate
@@ -47,7 +49,7 @@ class Atomic(expression.Expression):
 
     def __str__(self):
         """
-        String representation to print
+        String representation to print.
 
         >>> import variable
         >>> import predicate
@@ -56,22 +58,19 @@ class Atomic(expression.Expression):
         >>> y = variable.Variable('Y')
         >>> z = variable.Variable('Z')
         >>> a = Atomic(p, x, y, z)
-        >>> str(a)
-        'P(X, Y, Z)'
+        >>> print(a)
+        P(X, Y, Z)
         """
         return '%s(%s)' % (self.predicate, ', '.join([str(x)
                                                       for x in self.arguments]
                                                      ))
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Atomic'
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
+        """Compare two expressions to check if they're equal.
 
         >>> import constant
         >>> import predicate
@@ -88,13 +87,12 @@ class Atomic(expression.Expression):
         return False
 
     def __hash__(self):
-        """
-        Gets the hash of this atomic expression
-        """
+        """Get the hash of this atomic expression."""
         return hash((type(self), self.predicate, self.arguments))
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

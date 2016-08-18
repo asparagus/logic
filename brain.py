@@ -1,7 +1,6 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Brain class for logical processing."""
 import expressions.predicate
 import expressions.constant
 import expressions.atomic
@@ -11,13 +10,15 @@ import expressions.parser
 
 
 class Brain:
+    """Class modelling a logic brain."""
+
     def __init__(self):
         """
-        Creates a new brain with zero knowledge
+        Create a new brain with zero knowledge.
 
         >>> a = Brain()
-        >>> a.knowledge
-        set()
+        >>> len(a.knowledge)
+        0
         """
         self.parser = expressions.parser.Parser()
         self.knowledge = set()
@@ -26,7 +27,7 @@ class Brain:
 
     def eval(self, e):
         """
-        Evaluates a given expression according to the brain's knowledge
+        Evaluate a given expression according to the brain's knowledge.
 
         >>> p = expressions.predicate.Predicate('P')
         >>> q = expressions.predicate.Predicate('Q')
@@ -42,13 +43,10 @@ class Brain:
         False
         """
         result = e.eval(self.knowledge)
-        # print('%s => %s' % (e, result))
         return result
 
     def add_rule(self, antecedent, consequent):
-        """
-        Adds a give antecedent -> consequent rule to the brain
-        """
+        """Add a give antecedent -> consequent rule to the brain."""
         if antecedent not in self.rules:
             self.rules[antecedent] = set()
 
@@ -59,9 +57,7 @@ class Brain:
                 self.learn(consequent)
 
     def add_atomic(self, expr):
-        """
-        Adds a given expression to the knowledge base
-        """
+        """Add a given expression to the knowledge base."""
         self.knowledge.add(expr)
 
         if expr in self.memory:
@@ -76,11 +72,11 @@ class Brain:
                 self.learn(consequent)
 
     def add_memory(self, memory, reminder):
+        """Add a new memory to the brain."""
         self.memory[reminder] = memory
 
     def learn(self, e):
-        """
-        Adds a given expression to the knowledge base
+        """Add a given expression to the knowledge base.
 
         >>> p = expressions.predicate.Predicate('P')
         >>> x = expressions.constant.Constant('x')
@@ -90,7 +86,6 @@ class Brain:
         >>> b.eval(a)
         True
         """
-        # print('Brain <- %s' % str(e))
         if e.type() == 'Conjunction':
             self.learn(e.expr1)
             self.learn(e.expr2)
@@ -109,6 +104,7 @@ class Brain:
             print('None')
 
     def __str__(self):
+        """String representation of a brain's knowledge."""
         knowledge_str = str({str(e) for e in self.knowledge})
         rule_str = str({str(p): [str(q) for q in self.rules[p]]
                         for p in self.rules})
@@ -121,6 +117,7 @@ class Brain:
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

@@ -1,14 +1,22 @@
-if __package__ is not None:
-    import sys
-    sys.path.append('./' + __package__.replace('.', '/'))
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Implication expression class."""
+from __future__ import unicode_literals
 import expression
 
 
 class Implication(expression.Expression):
+    """
+    An implication expression.
+
+    Represents the logical implication between two sub-expressions.
+    Evaluates to true as long as it's not the case that the first
+    expression evaluates to true and the second doesn't.
+    """
+
     def __init__(self, expr1, expr2):
         """
-        Creates a new Implication off expressions 1 and 2
+        Create a new Implication off expressions 1 and 2.
 
         >>> e = Implication(1, 2)
         >>> e.expr1
@@ -21,8 +29,10 @@ class Implication(expression.Expression):
 
     def eval(self, knowledge={}):
         """
-        Evaluates the Conjunction expression
-        Returns true if both expressions are true
+        Evaluate the Implication expression.
+
+        Evaluates to true as long as it's not the case that the first
+        expression evaluates to true and the second doesn't.
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
@@ -40,25 +50,22 @@ class Implication(expression.Expression):
 
     def __str__(self):
         """
-        String representation to print
+        String representation to print.
 
         >>> t = expression.Tautology()
         >>> f = expression.Contradiction()
         >>> a = Implication(t, f)
-        >>> str(a)
-        '(T > F)'
+        >>> print(a)
+        (T > F)
         """
         return '(%s > %s)' % (self.expr1, self.expr2)
 
     def type(self):
-        """
-        Returns the type of this expression
-        """
+        """Return the type of this expression."""
         return 'Implication'
 
     def __eq__(self, other):
-        """
-        Compares two expressions to check if they're equal
+        """Compare two expressions to check if they're equal.
 
         >>> import constant
         >>> import predicate
@@ -83,13 +90,12 @@ class Implication(expression.Expression):
             self.expr2 == other.expr2
 
     def __hash__(self):
-        """
-        Gets the hash of this implication
-        """
+        """Get the hash of this implication."""
         return hash((type(self), self.expr1, self.expr2))
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()

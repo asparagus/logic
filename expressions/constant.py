@@ -1,29 +1,44 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+"""This module contains the Constant class."""
+from __future__ import unicode_literals
+
+
 class Constant:
+    """
+    A logic constant is an abstraction of an object.
+
+    Assertions or negations can be made of the constant's properties,
+    which constitute a predicate.
+    """
+
     def __init__(self, name):
         """
-        Creates a new constant with a given name
-        Constant names are all lower case
+        Create a new constant with a given name.
+
+        Constant names are all lower case.
 
         >>> a = Constant('a')
-        >>> a.name
-        'a'
+        >>> print(a.name)
+        a
         """
         self.name = name.lower()
 
     def __str__(self):
         """
-        String representation to print
+        String representation to print.
 
         >>> a = Constant('a')
-        >>> str(a)
-        'a'
+        >>> print(a)
+        a
         """
         return self.name
 
     def __eq__(self, other):
         """
-        Compares two constants to check if they're equal
-        Two constants are equal when they have the same name
+        Compare two constants to check if they're equal.
+
+        Two constants are equal when they have the same name.
 
         >>> c1 = Constant('c1')
         >>> c2 = Constant('c2')
@@ -38,13 +53,12 @@ class Constant:
         return type(self) == type(self) and self.name == other.name
 
     def __hash__(self):
-        """
-        Gets the hash of this constant
-        """
+        """Get the hash of this constant."""
         return hash(self.name)
 
 
 def test():
+    """Test the module."""
     print('Testing')
     import doctest
     doctest.testmod()
